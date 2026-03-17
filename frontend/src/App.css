@@ -195,6 +195,7 @@ form button[type="submit"]:hover {
 .carouselCard {
   display: flex;
   justify-content: center;
+  animation: cardEnter 260ms ease-out;
 }
 
 .empty {
@@ -244,6 +245,38 @@ form button[type="submit"]:hover {
   background: rgba(37, 99, 235, 0.06);
 }
 
+.task-edit__input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+}
+
+.task-edit__input:focus {
+  border-color: rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.task-edit__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-edit__label {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.task-edit__select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+}
+
 .carousel-button {
   position: absolute;
   top: 50%;
@@ -279,4 +312,15 @@ form button[type="submit"]:hover {
 .priority-high {
   color: #c62828;
   font-weight: 600;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import TaskForm from './components/TaskForm';
 import TaskItem from './components/TaskItem';
-import { getTasks, createTask, toggleTask, deleteTask } from './services/tasksApi';
+import { getTasks, createTask, toggleTask, deleteTask, updateTask } from './services/tasksApi';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -39,6 +39,15 @@ function App() {
       setCurrentIndex(0);
     } catch (err) {
       setError(err.message || 'Failed to delete task');
+    }
+  }
+
+  async function handleUpdateTask(id, updates) {
+    try {
+      const updated = await updateTask(id, updates);
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    } catch (err) {
+      setError(err.message || 'Failed to update task');
     }
   }
 
@@ -154,6 +163,7 @@ function App() {
                   task={currentTask}
                   onToggle={handleToggleTask}
                   onDelete={handleDeleteTask}
+                  onUpdate={handleUpdateTask}
                 />
               </div>
             </>
