@@ -48,7 +48,7 @@ Toggle completion status
   title: string,
   description: string,
   completed: boolean,
-  createdAt: string, // ISO date
+  createdAt: string,
   priority: 'low' | 'medium' | 'high'
 }
 ```
