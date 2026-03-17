@@ -10,6 +10,12 @@ function App() {
   const [error, setError] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filter, setFilter] = useState('all'); // all | completed | pending
+  const [sortBy, setSortBy] = useState('none'); // none | priority
+  const [theme, setTheme] = useState('dark'); // dark | light
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   async function handleAddTask(taskData) {
     try {
@@ -101,9 +107,15 @@ function App() {
     return true;
   });
 
-  const hasTasks = filteredTasks.length > 0;
-  const safeIndex = hasTasks ? currentIndex % filteredTasks.length : 0;
-  const currentTask = hasTasks ? filteredTasks[safeIndex] : null;
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortBy !== 'priority') return 0;
+    const rank = { low: 1, medium: 2, high: 3 };
+    return (rank[b.priority] || 0) - (rank[a.priority] || 0); // high -> low
+  });
+
+  const hasTasks = sortedTasks.length > 0;
+  const safeIndex = hasTasks ? currentIndex % sortedTasks.length : 0;
+  const currentTask = hasTasks ? sortedTasks[safeIndex] : null;
 
   return (
     <div className="page">
@@ -111,33 +123,54 @@ function App() {
         <header className="header">
           <h1>Task Manager</h1>
           <p className="subtitle">Create, manage, and track your tasks</p>
+          <button
+            type="button"
+            className="themeToggle"
+            onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+          >
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
         </header>
 
         <section className="panel">
           <TaskForm onSubmit={handleAddTask} />
 
-          <div className="segmented" role="tablist" aria-label="Task filter">
-            <button
-              type="button"
-              className={`segmented__btn ${filter === 'all' ? 'segmented__btn--active' : ''}`}
-              onClick={() => { setFilter('all'); setCurrentIndex(0); }}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              className={`segmented__btn ${filter === 'completed' ? 'segmented__btn--active' : ''}`}
-              onClick={() => { setFilter('completed'); setCurrentIndex(0); }}
-            >
-              Completed
-            </button>
-            <button
-              type="button"
-              className={`segmented__btn ${filter === 'pending' ? 'segmented__btn--active' : ''}`}
-              onClick={() => { setFilter('pending'); setCurrentIndex(0); }}
-            >
-              Pending
-            </button>
+          <div className="toolbar">
+            <div className="segmented" role="tablist" aria-label="Task filter">
+              <button
+                type="button"
+                className={`segmented__btn ${filter === 'all' ? 'segmented__btn--active' : ''}`}
+                onClick={() => { setFilter('all'); setCurrentIndex(0); }}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={`segmented__btn ${filter === 'completed' ? 'segmented__btn--active' : ''}`}
+                onClick={() => { setFilter('completed'); setCurrentIndex(0); }}
+              >
+                Completed
+              </button>
+              <button
+                type="button"
+                className={`segmented__btn ${filter === 'pending' ? 'segmented__btn--active' : ''}`}
+                onClick={() => { setFilter('pending'); setCurrentIndex(0); }}
+              >
+                Pending
+              </button>
+            </div>
+
+            <div className="sort">
+              <label className="sort__label">Sort</label>
+              <select
+                className="sort__select"
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setCurrentIndex(0); }}
+              >
+                <option value="none">None</option>
+                <option value="priority">Priority (high → low)</option>
+              </select>
+            </div>
           </div>
         </section>
 
@@ -151,7 +184,7 @@ function App() {
                   ‹ Prev
                 </button>
                 <div className="counter">
-                  {safeIndex + 1} / {filteredTasks.length}
+                  {safeIndex + 1} / {sortedTasks.length}
                 </div>
                 <button type="button" className="navBtn" onClick={showNext}>
                   Next ›
